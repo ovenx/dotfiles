@@ -111,10 +111,7 @@ if g:isGUI
     set guioptions+=b                   " show bottom scrollbar
     set t_Co=256                        " use 256 colors int XTerm
     set guitablabel=%M\ %t
-    set guifont=Iosevka:h12
-    "set guifont=Fira\ Code:h11
-    "set guifont=Inziu\ Iosevka\ SC:h12
-    "
+    set guifont=Sarasa_MONO_TC:h12
 endif
 
 " }}}
@@ -175,10 +172,7 @@ autocmd FileType wxml setlocal shiftwidth=2 tabstop=2
 autocmd FileType json setlocal shiftwidth=2 tabstop=2
 " }}}
 " Plug {{{
-" filetype off
-" set rtp+=$VIM/vimfiles/bundle/Vundle.vim
-" call vundle#begin('$VIM/vimfiles/bundle/')
-call plug#begin('$VIM/vimfiles/plugged')
+call plug#begin('$VIM/autoload/plugged')
 
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
@@ -225,7 +219,7 @@ if has('nvim')
 endif
 " }}}
 " tagbar {{{
-let g:tagbar_ctags_bin='E:/Dropbox/Src/dotfiles/vim/vimfiles/bin/ctags58/ctags.exe'
+let g:tagbar_ctags_bin='E:/Dropbox/Apps/ctags.exe'
 nmap <silent> <F8> :TagbarToggle<CR>
 " }}}
 " nerdtree {{{
