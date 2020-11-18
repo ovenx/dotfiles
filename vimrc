@@ -17,11 +17,16 @@ endif
 set nocompatible                        " use vim defaults not vi
 let mapleader = ","
 let g:mapleader = ","
-set mouse=a                             " enable the mouse in all modes (i:inset mode ,c: command mode,n:normal mode; a:all)
+if g:isGUI
+  set mouse=a                             " enable the mouse in all modes (i:inset mode ,c: command mode,n:normal mode; a:all)
+else
+  set mouse=c
+endif
 set clipboard+=unnamed                  " share the clip board ouside
 set autochdir                           " switch the dir to current dir 
 set browsedir=buffer
 set autoread                        " set to auto read when a file is changed from outside
+set signcolumn=yes
 " }}}
 " Encoding {{{
 if has('multi_byte') && !has('nvim')
@@ -111,7 +116,7 @@ if g:isGUI
     set guioptions+=b                   " show bottom scrollbar
     set t_Co=256                        " use 256 colors int XTerm
     set guitablabel=%M\ %t
-    set guifont=Sarasa_MONO_TC:h12
+    set guifont=Sarasa_MONO_SC:h16
 endif
 
 " }}}
@@ -183,23 +188,19 @@ Plug 'tpope/vim-unimpaired'
 Plug 'Yggdroot/indentLine'
 Plug 'itchyny/lightline.vim'
 Plug 'whatyouhide/vim-gotham'
-Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'junegunn/vim-easy-align'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'junegunn/fzf'
 Plug 'sheerun/vim-polyglot'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 "Plug 'junegunn/seoul256.vim'
 "Plug 'morhetz/gruvbox'
 "Plug 'altercation/vim-colors-solarized'
 Plug 'joshdick/onedark.vim'
-Plug 'w0rp/ale'
+Plug 'skywind3000/asyncrun.vim'
 "Plug 'SirVer/ultisnips'
 "Plug 'honza/vim-snippets'
 if has('nvim')
-"Plug 'phpactor/phpactor' ,  {'do': 'composer install', 'for': 'php'}
-"Plug 'ncm2/ncm2'
-"Plug 'roxma/nvim-yarp'
-"Plug 'phpactor/ncm2-phpactor'
 endif
 
 call plug#end()
@@ -219,7 +220,9 @@ if has('nvim')
 endif
 " }}}
 " tagbar {{{
-let g:tagbar_ctags_bin='E:/Dropbox/Apps/ctags.exe'
+if g:isGUI
+  let g:tagbar_ctags_bin='E:/Dropbox/Apps/ctags.exe'
+endif
 nmap <silent> <F8> :TagbarToggle<CR>
 " }}}
 " nerdtree {{{
@@ -290,6 +293,32 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 
 " }}}
+" asyncrun {{{
+let g:asyncrun_open = 6
+" F10 to toggle quickfix window
+nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
+noremap <F5> :AsyncRun gcc "%" -o "%<" <cr> 
+" }}}
+" coc {{{
+" Use tab for trigger completion with characters ahead and navigate.
+let g:coc_disable_startup_warning=1
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+" Note coc#float#scroll works on neovim >= 0.4.0 or vim >= 8.2.0750
+nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
 " }}}
 " Mappings {{{
 nmap <C-j> <C-W>j
@@ -318,6 +347,10 @@ imap jk <ESC>
 
 " toggle cursorcolumn
 map <silent><leader>cr :call ToggleCursorColumn()<CR>
+map <F5> :call CompileRunGcc()<CR>
+autocmd filetype python nnoremap <F5> :w <bar> exec '!python '.shellescape('%')<CR>
+autocmd filetype c nnoremap <F5> :w <bar> exec '!gcc '.shellescape('%').' -o '.shellescape('%:r').' && ./'.shellescape('%:r')<CR>
+autocmd filetype cpp nnoremap <F5> :w <bar> exec '!g++ '.shellescape('%').' -o '.shellescape('%:r').' && ./'.shellescape('%:r')<CR>
 " }}}
 " Tips {{{
 " cs{motion}{str}: change the surround
@@ -373,5 +406,8 @@ function! ToggleCursorColumn()
     endif
 endfunction
 " }}}
-let g:python3_host_prog='E:/Dropbox/Apps/python/python.exe'
+"
+if g:isGUI
+  let g:python3_host_prog='E:/Dropbox/Apps/python/python.exe'
+endif
 " vim:foldmethod=marker:foldlevel=0
