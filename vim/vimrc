@@ -22,11 +22,12 @@ if g:isGUI
 else
   set mouse=c
 endif
-set clipboard+=unnamed                  " share the clip board ouside
+set clipboard^=unnamed,unnamedplus
 set autochdir                           " switch the dir to current dir 
 set browsedir=buffer
 set autoread                        " set to auto read when a file is changed from outside
 set signcolumn=yes
+set pastetoggle=<F2>
 " }}}
 " Encoding {{{
 if has('multi_byte') && !has('nvim')
@@ -86,7 +87,9 @@ set cmdheight=1                         " height of the command bar
 set laststatus=2                        " always show the statue line
 set showtabline=2                       " always show tabs
 set whichwrap+=<,>,h,l
-set nowrap                              " don't wrap lines
+if g:isGUI
+  set nowrap                              " don't wrap lines
+endif
 set iskeyword+=_,$,@,%,#,-              " don't break word when word with this key char
 set fileformats=unix,dos,mac            " use unix as the standard file type
 set list                                " display whitespace
@@ -344,6 +347,9 @@ nmap <silent> <leader>s :tabnew $VIM/_vimrc<CR>
 nmap <silent> <leader>e :e! $VIM/_vimrc<CR>
 command -nargs=1 Vg :vimgrep <args> | copen
 imap jk <ESC>
+
+" auto pastetoggle
+inoremap <S-Insert><ESC>:setl paste<CR>gi<C-R>+<ESC>:setl nopaste<CR>gi
 
 " toggle cursorcolumn
 map <silent><leader>cr :call ToggleCursorColumn()<CR>
